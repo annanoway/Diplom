@@ -1,70 +1,80 @@
-let players = ['x', 'o'];
-let activePlayer = 0;
-let gameField = null
+let players = ['x', 'o']; // рисуют каракули
+let activePlayer = 0; // тот кто рисует каракули в этот ход
+let board; // штука на которой рисуют каракули
 
-function createGameField () {
-  return [
-    ['','','']
-    ['','','']
-    ['','','']
-  ]
-}
-
-function startGame () {
-  gameField = createGameField ();
+function startGame() {
   activePlayer = 0;
-  renderBoard (gameField)
+  board = [
+    ['', '', ''],
+    ['', '', ''],
+    ['', '', '']
+  ];
+  renderBoard(board);
 }
 
-function isWinningSituation () {
+function changePlayer() {
+  if (activePlayer === 0) {
+    activePlayer = 1;
+  } else if (activePlayer === 1) {
+    activePlayer = 0;
+  }
+  return activePlayer;
+}
 
-  const N = gameField.lenght;
-  for (let i=0; i < N; i++) {
-    if(isWnningSequence(i, i+1, 0, 0, N, 1) || isWnningSequence(0, N, 1, i, i+1, 0)){
-      return true
+function click(row, column) {
+  board[row][column] = players[activePlayer];
+  renderBoard(board);
+  gameProgress();
+}
+
+function gameProgress() {
+    let countEqual = 0;
+  for (let j = 0; j < board.length; j++) {
+    for (let i = 0; i < board.length; i++) {
+      if (board[j][i] === players[activePlayer]) {
+        countEqual++;
+      } else break;
     }
   }
 
-  if (
- isWnningSequence(0, N, 1, 0, N, 1) ||
- isWnningSequence(N-1, -1, -1, 0, N, 1)
- ) {
- return true;
- }
-
-  return false
-}
-
-function click (row, colomn) {
-  const PlayerSimbol = players[activePlayer];
-  gameField[row][colomn] = PlayerSimbol;
-  renderBoard(gameField);
-
-  if (isWinningSituation()) {
+  if (countEqual === board.length) {
     showWinner(activePlayer);
   }
+  countEqual = 0;
 
-  activePlayer = (activePlayer + 1)%players.lenght
-}
-
-function isWnningSequence(r0, r1, ri, c0, c1, ci) {
-  let firstSimbol = null;
-
-  for(let r=r0, c=c0; math.abs(r1-r)>0 && math.abs(c1-c)>0; r+=ri, c+=ci) {
-    const simbol = gameField[r][c]
-    
-    if (simbol ==='') {
-      return false;
-    }
-
-    if (firstSimbol = null) {
-      firstSimbol = simbol;
-      continue;
-    }
-
-    if (firstSimbol !== simbol) {
-      return false;
+  for (let j = 0; j < board.length; j++) {
+    for (let i = 0; i < board.length; i++) {
+      if (board[i][j] === players[activePlayer]) {
+        countEqual++;
+      } else break;
     }
   }
-  return true
+
+  if (countEqual === board.length) {
+    showWinner(activePlayer);
+  }
+  countEqual = 0;
+
+  for (let i = 0; i < board.length; i++) {
+    if (board[i][i] === players[activePlayer]) {
+      countEqual++;
+    } else break;
+  }
+
+  if (countEqual === board.length) {
+    showWinner(activePlayer);
+  }
+  countEqual = 0;
+
+  let j = 0;
+  for (let i = (board.length - 1); i >= 0; i--) {
+    if (board[i][j] === players[activePlayer]) {
+      countEqual++;
+      j++;
+    } else break;
+  }
+  if (countEqual === board.length) {
+    showWinner(activePlayer);
+  }
+  changePlayer();
 }
